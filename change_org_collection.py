@@ -1,8 +1,13 @@
-import urllib
-import urllib2
-import os
+import os,sys
 import glob
 from datetime import date
+import json
+import requests
+
+sys.path.append('converters/signature_converter_v2/')
+import petitions_signature_converter
+sys.path.append('converters/reasons_converter_v2/')
+import petition_reasons_converter
 
 class Change_Org_Collection:
 
@@ -13,20 +18,18 @@ class Change_Org_Collection:
         config.close()
 
         petition_url = 'http://www.change.org/petitions/' + petition_name
-
-
-        query_url = 'https://api.change.org/v1/petitions/get_id'
-
+        
+	query_url = 'https://api.change.org/v1/petitions/get_id'
 
         parameters  = { 'api_key': api, 'petition_url': petition_url }
 
-        result = urllib.urlencode(parameters)
+	r = requests.get(query_url, params=parameters)
 
-        request = query_url + '?' + result
+	response = r.json()
 
-        response = urllib2.urlopen(request).read(1000)
+	pet_id = response['petition_id']
 
-        return response
+        return pet_id
 
     def get_signatures(self, petition_title, out_file, page_num):
 
@@ -34,41 +37,25 @@ class Change_Org_Collection:
 	api = config.read().replace('\n', '')
 	config.close()
 
-	petition_id = self.get_petition_id(petition_title)
+	o_file = open(out_file, 'wb')
+
+	petition_id = str(self.get_petition_id(petition_title))
         
-	pid_dict = {}
-
-        key,value = petition_id.split(',')
-
-	sec_val = value
-
-        key, value = key.split(':')
-
-	pid_dict[key] = value
-
-	sec_key, sec_value = sec_val.split(':')
-
-	pid_dict[sec_key] = sec_value
-
-	pet_id =  pid_dict['"petition_id"'].split('}')
+	sig_url = 'http://api.change.org/v1/petitions/' + petition_id + '/signatures'
         
-	pid = pet_id[0]
-		
-	sig_url = 'http://api.change.org/v1/petitions/' + pid + '/signatures'
-        
-	parameters  = { 'api_key': api }
-	
-	result = urllib.urlencode(parameters)
+	parameters  = { 'api_key': api , 'page_size': 500, 'page': page_num}
 
-	query_parm = '&page_size=500&page=' + page_num
+	sig_req = requests.get(sig_url, params=parameters)
 
-	fin_url = sig_url + '?' + result + query_parm
+	sig_res = sig_req.json()
 
-        print urllib.urlretrieve(fin_url, out_file)
+	o_file.write((json.dumps(sig_res)))
 
-    def get_all_signatures(self, title):
+    def get_all_signatures(self, date, path_to_file_out, title):
 
-	pages = int(self.get_pages(title))
+	sc = petitions_signature_converter.Signature_Converter()
+
+	pages = int(self.get_pages(title, 0))
 
         pages += 1
 
@@ -78,7 +65,9 @@ class Change_Org_Collection:
 
 	    self.get_signatures(title, sig_out, str(i))
 
-	self.concat_files('data/' + str(date.today()) + '/' + title.strip())
+            sc.converter(date, sig_out, path_to_file_out + '/', title + '-' + 'page_' + str(i) + '.sig')
+
+	self.concat_files('sig', path_to_file_out + '/' + date + '/', path_to_file_out + '/' + date + '/' + title )
 
 
     def get_petition_text(self, petition_title, out_file):
@@ -87,95 +76,31 @@ class Change_Org_Collection:
 	api = config.read().replace('\n', '')
 	config.close()
 
-	petition_id = self.get_petition_id(petition_title)
-        
-	pid_dict = {}
+	o_file = open(out_file, 'wb')
 
-        key,value = petition_id.split(',')
-
-	sec_val = value
-
-        key, value = key.split(':')
-
-	pid_dict[key] = value
-
-	sec_key, sec_value = sec_val.split(':')
-
-	pid_dict[sec_key] = sec_value
-
-	pet_id =  pid_dict['"petition_id"'].split('}')
-        
-	pid = pet_id[0]
+	pid = str(self.get_petition_id(petition_title))
 		
-	sig_url = 'http://api.change.org/v1/petitions/' + pid
+	body_url = 'http://api.change.org/v1/petitions/' + pid
 
         parameters  = { 'api_key': api }
 
-        result = urllib.urlencode(parameters)
+	body_req = requests.get(body_url, params=parameters)
 
-	fin_url = sig_url + '?' + result
-	
-	print urllib.urlretrieve(fin_url, out_file.strip())
+	body_res = body_req.json()
 
-    def results_parse(self, text_file_in, text_file_out):
+	o_file.write(json.dumps(body_res))
 
-        in_file = open(text_file_in, 'r')
-	out_file = open(text_file_out, 'w')
-
-	line = in_file.read()
-
-	text = line.split(',')
-
-
-        for stuff in text:
-
-	    if '"page":' in stuff:
-
-		page = '\n\n' + stuff + '}\n\n'
-
-		out_file.write(page)
-
-	    if '"total_pages":' in stuff:
-
-		total_pages = '{' + stuff + '}\n\n'
-		
-		out_file.write(total_pages)
-
-	    if '"signature_count":' in stuff:
-
-		signature_count = '{' + stuff + '}\n\n'
-		out_file.write(signature_count)
-
-	    if '"name":' in stuff:
-
-		name = stuff + '}\n'
-
-		out_file.write(name)
-
-            if '"city":' in stuff:
-
-		city = '\t{' + stuff + '}\n'
-		out_file.write(city)
-
-            if '"state_province":' in stuff:
-
-		state_province = '\t{' + stuff + '}\n'
-		out_file.write(state_province)
-
-	    if '"country_code":' in stuff:
-
-		country_code = '\t{' + stuff + '}\n'
-		out_file.write(country_code)
-
-	    if '"signed_at":' in stuff:
-
-		signed_at = '\t{' + stuff + '}\n'
-		out_file.write(signed_at)
 
       
-    def get_pages(self, title):
+    def get_pages(self, title, reasons):
 
-	self.get_signatures(title, 'temp.tmp', '1')
+	if (reasons == 0):
+	    
+	    self.get_signatures(title, 'temp.tmp', '1')
+
+	elif (reasons == 1):
+
+	    self.get_reasons(title, '.', 'temp.tmp', '1')
        
         temporary = open('temp.tmp', 'r')
 
@@ -199,58 +124,91 @@ class Change_Org_Collection:
 
 	return tot_pgs
 
-    def concat_files(self, file_out):
+    def concat_files(self, file_ext, path_to_file_in, file_out):
 
-	files = glob.glob('*.sigtmp')
+	if (file_ext == 'sig'):
 
-	output_file = open(file_out + '.sig', 'wb')
+	    ext_tmp = '*.sigtmp'
+	    ext = '.sig'
+
+	elif (file_ext == 'reasons'):
+
+	    ext_tmp = '*.reasonstmp'
+	    ext = '.reasons'
+
+	files = glob.glob(path_to_file_in + '*' + ext)
+
+	output_file = open(file_out.strip('reasons') + ext + '.cat', 'wb')
+
+	if (file_ext == 'sig'):
+	    
+	    output_file.write('Page,Total Pages,Signature Count,Signatures\n,,,Name,City,State/Province,Country Code,Country Name,Signed At\n')
+
+	elif (file_ext == 'reasons'):
+
+	    output_file.write('Page,Total Pages,Reasons\n,,Created At,Content,Like Count,Author Name,Author URL\n')
 
 	for line in files:
+
+            print line
 
 	    input_files = open(line, 'r')
 
 	    output_file.write(input_files.read())
+	    output_file.write('\n')
 	    input_files.close()
 
-	for file_name in glob.glob('*.sigtmp'):
+	for file_name in glob.glob(path_to_file_in + '/' + ext_tmp):
 	
 	    os.remove(file_name)
 
-        file_parsed = file_out + '_parsed'
+	output_file.close()
 
-        self.results_parse(file_out, file_parsed) 
+    def get_reasons(self, petition_title, path_to_file_out, file_out, page):
+
+	config = open('api_key', 'r')
+	api = config.read().replace('\n', '')
+	config.close()
 
 
+	if not os.path.exists(path_to_file_out):
+	    
+	    os.makedirs(path_to_file_out)
 
-        
+	pid = str(self.get_petition_id(petition_title))
 
+	reasons_url = 'http://api.change.org/v1/petitions/' + pid + '/reasons'
 
+	parameters  = { 'api_key': api, 'page_size': '500', 'page': str(page)}
 
+        reasons_req = requests.get(reasons_url, params=parameters)
+
+	o_file = open(path_to_file_out + '/' + file_out, 'w')
 	
+	reasons_res = reasons_req.json()
+
+	o_file.write(json.dumps(reasons_res))
 
 
-	
+    def get_all_reasons(self, path_to_file_out, in_file):
 
-	
+        i_file = open(in_file, 'r')
 
+	sc = petition_reasons_converter.Reason_Converter()
 
+	for title in i_file:
 
+	    pages = int(self.get_pages(title, 1))
 
+            pages += 1
 
+	    for i in range(1, pages):
 
+		reasons_out = 'reasons_pg_' + str(i) + '.reasonstmp'
 
+		self.get_reasons(title, path_to_file_out + '/' + str(date.today()), reasons_out, str(i))
 
-
-
-
-
-
-
-
-
-
-
+                sc.converter( str(date.today()), path_to_file_out + '/' + str(date.today()) + '/' + reasons_out, path_to_file_out + '/' , title.strip() + '-' + 'page_' + str(i) + '.reasons')
 
 
-
-
+    	self.concat_files('reasons', path_to_file_out + '/' + str(date.today()) + '/', path_to_file_out + '/' + str(date.today()) + '/' + title.strip() )

@@ -4,15 +4,20 @@ import getopt, sys
 def main(argv):
 
     outfile = ''
+    infile = ''
 
     co = change_org_collection.Change_Org_Collection()
     sc = change_org_search.Change_Org_Search()
 
-    opts, args = getopt.getopt(argv, "u:s:g:o:p:m:n:a:b:r")
+    opts, args = getopt.getopt(argv, "i:u:s:g:o:p:m:n:a:b:rcd:ef:h:")
 
     for opt, arg in opts:
 
-	if opt == "-u":
+        if (opt == "-d"):
+
+	    date = arg
+
+        if opt == "-u":
 
 	    title = arg
             co.get_petition_id(title)
@@ -30,6 +35,10 @@ def main(argv):
 
 	    title = arg
 	    co.get_signatures(title, outfile, page)
+
+	if opt == "-h":
+
+	    path_to_file_out = arg
 
         if opt == "-o":
 
@@ -53,11 +62,26 @@ def main(argv):
 	if opt == "-a":
 
 	    title = arg
-	    co.get_all_signatures(title)
+	    co.get_all_signatures(date, path_to_file_out, title)
 
         if opt == "-r":
 
 	    sc.get_most_recent(outfile)
+	   
+	if opt == "-c":  
+
+	    co.get_all_reasons(path_to_file_out, infile)
+
+	if opt =="-i":
+
+	    infile = arg
+
+
+        if opt == "-e":
+
+            sc.collect_pet_and_sig(date, infile)
+
+
 
 
 if __name__ =='__main__':
