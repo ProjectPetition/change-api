@@ -1,0 +1,50 @@
+page,total pages,signature count,signatures
+,,,name,,city,state/province,country code,country name,signed at
+,,,First,Last
+
+1,1,12
+,,,Booker,DeWitt,,null,null,null,2013-09-11T09
+
+,,,Shigeru,Miyamoto,Nintendoland,,,null,2013-09-11T10
+
+,,,Brown,Jones,Brownsville,OR,US,United States,2013-09-11T10
+
+,,,Kazuo,Hirai,New York,NY,US,United States,2013-09-11T11
+
+,,,John,Shepard,New York,NY,US,United States,2013-09-11T12
+
+,,,Insum,Snoy,Lincoln,Eng,GB,United Kingdom,2013-09-11T14
+
+,,,Gabe,Newell,Bellevue,WA,US,United States,2013-09-11T15
+
+,,,Riley,Moore,Azle,TX,US,United States,2013-09-15T00
+
+,,,Franken,Stein,Needham,MA,US,United States,2013-09-22T05
+
+,,,Zachary,Farrara,BROOKLYN,NY,US,United States,2013-11-14T08
+
+page,total pages,signature count,signatures
+,,,name,,city,state/province,country code,country name,signed at
+,,,First,Last
+
+1,1,12
+,,,Booker,DeWitt,,null,null,null,2013-09-11T09
+
+,,,Shigeru,Miyamoto,Nintendoland,,,null,2013-09-11T10
+
+,,,Brown,Jones,Brownsville,OR,US,United States,2013-09-11T10
+
+,,,Kazuo,Hirai,New York,NY,US,United States,2013-09-11T11
+
+,,,John,Shepard,New York,NY,US,United States,2013-09-11T12
+
+,,,Insum,Snoy,Lincoln,Eng,GB,United Kingdom,2013-09-11T14
+
+,,,Gabe,Newell,Bellevue,WA,US,United States,2013-09-11T15
+
+,,,Riley,Moore,Azle,TX,US,United States,2013-09-15T00
+
+,,,Franken,Stein,Needham,MA,US,United States,2013-09-22T05
+
+,,,Zachary,Farrara,BROOKLYN,NY,US,United States,2013-11-14T08
+
