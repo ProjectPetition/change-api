@@ -1,4 +1,4 @@
-import change_org_collection, change_org_search
+import modules
 import getopt, sys
 
 def main(argv):
@@ -6,12 +6,26 @@ def main(argv):
     outfile = ''
     infile = ''
 
-    co = change_org_collection.Change_Org_Collection()
-    sc = change_org_search.Change_Org_Search()
+    gpid = modules.get_pet_id()
+    search = modules.change_search()
+    gsig = modules.get_signatures()
+    gpettxt = modules.pet_text()
+    gpgs = modules.get_pgs()
+    gmr = modules.most_recent()
+    gar = modules.get_reasons() 
+    cps = modules.collect_pet_sig()
 
-    opts, args = getopt.getopt(argv, "i:u:s:g:o:p:m:n:a:b:rcd:ef:h:")
+    opts, args = getopt.getopt(argv, "i:k:u:s:g:o:p:n:a:b:rcd:ef:h:j:")
 
     for opt, arg in opts:
+
+	if (opt == "-k"):
+
+	    sig_or_reason = arg
+
+	if (opt == "-j"):
+
+	    page_size = arg		
 
         if (opt == "-d"):
 
@@ -20,12 +34,12 @@ def main(argv):
         if opt == "-u":
 
 	    title = arg
-            co.get_petition_id(title)
+            gpid.get_petition_id(title)
 	
 	if opt == "-s":
             
 	    search = arg
-	    sc.search(search, outfile)
+	    search.search(search, outfile)
 
         if opt == "-n":
 
@@ -34,7 +48,7 @@ def main(argv):
         if opt == "-g":
 
 	    title = arg
-	    co.get_signatures(title, outfile, page)
+	    gsig.get_signatures(title, outfile, page, page_size)
 
 	if opt == "-h":
 
@@ -47,30 +61,29 @@ def main(argv):
 	if opt == "-p":
 
 	    title = arg
-	    co.get_petition_text(title, outfile)
-
-        if opt == "-m":
-
-	    f_parse = arg
-	    co.results_parse(f_parse, outfile)
+	    gpettxt.get_petition_text(title, outfile)
 
 	if opt == "-b":
 
 	    title = arg
-	    co.get_pages(title)
+	    gpgs.get_pages(title, sig_or_reason)
 
 	if opt == "-a":
 
-	    title = arg
-	    co.get_all_signatures(date, path_to_file_out, title)
+#	    title = arg
+#	    gsig.get_all_signatures(date, path_to_file_out, title, page_size)
+ 
+            cps.collect_pet_and_sig(date, infile, page_size)
+            gar.get_all_reasons(path_to_file_out, infile, page_size)
+
 
         if opt == "-r":
 
-	    sc.get_most_recent(outfile)
+	    gmr.get_most_recent(outfile)
 	   
 	if opt == "-c":  
 
-	    co.get_all_reasons(path_to_file_out, infile)
+	    gar.get_all_reasons(path_to_file_out, infile, page_size)
 
 	if opt =="-i":
 
@@ -79,8 +92,7 @@ def main(argv):
 
         if opt == "-e":
 
-            sc.collect_pet_and_sig(date, infile)
-
+            cps.collect_pet_and_sig(date, infile, page_size)
 
 
 
