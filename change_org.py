@@ -15,7 +15,7 @@ def main(argv):
     gar = modules.get_reasons() 
     cps = modules.collect_pet_sig()
 
-    opts, args = getopt.getopt(argv, "i:k:u:s:g:o:p:n:a:b:rcd:ef:h:j:")
+    opts, args = getopt.getopt(argv, "i:k:u:s:g:o:p:n:ab:rcd:ef:h:j:")
 
     for opt, arg in opts:
 

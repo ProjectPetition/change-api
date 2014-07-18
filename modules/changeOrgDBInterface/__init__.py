@@ -20,13 +20,13 @@ def petition_reasons_db():
 
     from . import petResDB
 
-    return petResDB.Reasons_DB
+    return petResDB.Reasons_DB()
 
-def petition_signagures_db():
+def petition_signatures_db():
 
     from . import petSigDB
 
-    return petSigDB.Signature_DB
+    return petSigDB.Signature_DB()
 
 def petition_targ_db():
 

@@ -1,7 +1,9 @@
 import requests
 import changeOrgDBInterface
+import modules
 
 pbdb = changeOrgDBInterface.pet_Body_DB()
+gpid = modules.get_pet_id()
 
 
 class GetPetText:
@@ -17,7 +19,7 @@ class GetPetText:
 
 	o_file = open(out_file, 'wb')
 
-	pid = str(self.get_petition_id(petition_title))
+	pid = str(gpid.get_petition_id(petition_title))
 		
 	body_url = 'http://api.change.org/v1/petitions/' + pid
 

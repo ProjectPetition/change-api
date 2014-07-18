@@ -12,8 +12,8 @@ class Body_DB:
 
 	pet_body = changeDB.Petitions()
         ptdb = modules.get_targ_rec()	
-	org_info = org.GetOrgInfo()
-	podb = org.GetOrgInfo()
+#	org_info = org.GetOrgInfo()
+	podb = changeDB.Organizations()
 	pet_targ = changeDB.Target()
 	pet_users = petUsersDB.Users_DB()
 
@@ -22,7 +22,7 @@ class Body_DB:
 
         try:
             
-	    org_id = org_info.get_organization_id(raw_body['organization_url'])['organization_id']
+	    org_id = org.get_organization_id(raw_body['organization_url'])['organization_id']
 
 	except:
 
@@ -41,7 +41,7 @@ class Body_DB:
 
 	try:
 	    
-	    podb.insert(org_info.get_organization_record(str(org_id)))
+	    podb.insert(org.get_organization_record(str(org_id)))
 	
 	except:
 
@@ -50,7 +50,7 @@ class Body_DB:
 
 	try:
 	    
-	    targ_rec =  org_info.get_target_record(raw_body['petition_id'])
+	    targ_rec =  org.get_target_record(raw_body['petition_id'])
 
 	except:
 

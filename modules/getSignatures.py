@@ -1,8 +1,9 @@
 import json
 import requests
-import modules
-
-
+import converters
+import getPages
+import changeOrgDBInterface
+import getPetitionID
 
 class GetSignatures:
 
@@ -13,13 +14,14 @@ class GetSignatures:
 	api = config.read().replace('\n', '')
 	config.close()
 
-	psdb = modules.petition_signatures_db() 
+	psdb = changeOrgDBInterface.petition_signatures_db()
+        gpid = getPetitionID.GetPetitionID()
 
 	if (out_file != ''):
 	    
 	    o_file = open(out_file, 'wb')
 
-	petition_id = str(self.get_petition_id(petition_title))
+	petition_id = str(gpid.get_petition_id(petition_title))
         
 	sig_url = 'http://api.change.org/v1/petitions/' + petition_id + '/signatures'
         
@@ -43,9 +45,10 @@ class GetSignatures:
 
     def get_all_signatures(self, date, path_to_file_out, title, page_size):
 
-	sc = modules.sig_conv()
+	sc = converters.sig_conv()
+	gp = getPages.GetPages()
 
-	pages = int(self.get_pages(title, 0))
+	pages = int(gp.get_pages(title, 0))
 
         pages += 1
 
@@ -61,5 +64,11 @@ class GetSignatures:
 
         if (page_size > 1):
 	
-	    self.concat_files('sig', path_to_file_out + '/' + date + '/', path_to_file_out + '/' + date + '/' + title )
+	    try:
+		
+		self.concat_files('sig', path_to_file_out + '/' + date + '/', path_to_file_out + '/' + date + '/' + title )
+
+	    except: 
+		
+		print "No Files to Concatenate\n"
 

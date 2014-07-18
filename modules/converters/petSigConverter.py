@@ -22,34 +22,48 @@ class Signature_Converter:
 
 	data = []
 
-        data = json.load(in_file)
+	try:
+	    
+	    data = json.load(in_file)
+
+	except:
+
+	    print "No File to Load\n"
 
 
-	out_file.write(str(data['page']) + ',' + str(data['total_pages']) + ',' + str(data['signature_count']) + '\n')
+	try:
+	    
+	    out_file.write(str(data['page']) + ',' + str(data['total_pages']) + ',' + str(data['signature_count']) + '\n')
 
 
 
-	for sig in data['signatures']:
+	    for sig in data['signatures']:
 
-	    if (sig['city'] is None):
+	        if (sig['city'] is None):
 
-		sig['city'] = 'None'
+		    sig['city'] = 'None'
 
-	    if (sig['state_province'] is None):
+	        if (sig['state_province'] is None):
 
-		sig['state_province'] = 'None'
+		    sig['state_province'] = 'None'
 
-	    if (sig['country_code'] is None):
+	        if (sig['country_code'] is None):
 
-		sig['country_code'] = 'None'
+		    sig['country_code'] = 'None'
 
-            if (sig['country_name'] is None):
+	        if (sig['country_name'] is None):
 
-		sig['country_name'] = 'None'
+		    sig['country_name'] = 'None'
 
-	    out_file.write(',,,')
-	    out_file.write(str(sig['name'].encode('ascii', 'ignore')) + ',' + str(sig['city'].encode('ascii', 'ignore').replace(',', ' ')) + ','  + str(sig['state_province'].encode('ascii', 'ignore')) + ',' + str(sig['country_code'].encode('ascii', 'ignore')) + ',' + str(sig['country_name'].encode('ascii', 'ignore')) + ',' + str(sig['signed_at']))
-	    out_file.write('\n')
+	        out_file.write(',,,')
+	        out_file.write(str(sig['name'].encode('ascii', 'ignore')) + ',' + str(sig['city'].encode('ascii', 'ignore').replace(',', ' ')) + ','  + str(sig['state_province'].encode('ascii', 'ignore')) + ',' + str(sig['country_code'].encode('ascii', 'ignore')) + ',' + str(sig['country_name'].encode('ascii', 'ignore')) + ',' + str(sig['signed_at']))
+	        out_file.write('\n')
+
+	except:
+
+	    print "Write to file failed\n"
+
+
 
 
         out_file.close()

@@ -7,10 +7,7 @@ class Signature_DB:
 
     def insert(self, pid, raw_sig):
 
-
 	sigs = changeDB.Signatures()
-
-	print raw_sig
 
 	for sig in raw_sig['signatures']:
 
@@ -29,7 +26,6 @@ class Signature_DB:
             if (sig['country_name'] is None):
 
 		sig['country_name'] = 'None'
-
 		
 
 	sigs.create(name = sig['name'], city = sig['city'], state = sig['state_province'], country = sig['country_name'], country_code = sig['country_code'], signed_on = sig['signed_at'], petition = pid)
